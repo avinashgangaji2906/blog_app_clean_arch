@@ -30,8 +30,8 @@ class BlogModel extends Blog {
       title: map['title'] as String,
       content: map['content'] as String,
       imageUrl: map['image_url'] as String,
-      topics: List<String>.from(map['topics'] as List<String>),
-      updatedAt: map['updated_at']
+      topics: List<String>.from(map['topics'] ?? []),
+      updatedAt: map['updated_at'] == null
           ? DateTime.now()
           : DateTime.parse(map['updated_at']),
     );
