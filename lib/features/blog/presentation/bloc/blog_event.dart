@@ -17,3 +17,7 @@ class BlogUploadEvent extends BlogEvent {
       required this.content,
       required this.topics});
 }
+
+class BlogGetAllBlogsEvent extends BlogEvent {
+  BlogGetAllBlogsEvent();
+}

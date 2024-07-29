@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:blog_app_clean_arch/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:blog_app_clean_arch/core/common/widgets/loader.dart';
+import 'package:blog_app_clean_arch/core/constants/constants.dart';
 import 'package:blog_app_clean_arch/core/theme/app_pallete.dart';
 import 'package:blog_app_clean_arch/core/utils/image_pick.dart';
 import 'package:blog_app_clean_arch/core/utils/show_snackbar.dart';
@@ -81,7 +82,7 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
           if (state is BlogFailure) {
             showSnackbar(context, state.message);
           }
-          if (state is BlogSuccess) {
+          if (state is BlogUploadSuccess) {
             Navigator.pushAndRemoveUntil(
               context,
               BlogPage.route(),
@@ -152,12 +153,7 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
-                        children: [
-                          "Programming",
-                          "Bussiness",
-                          "Entertainment",
-                          "Technology"
-                        ]
+                        children: Constants.topics
                             .map(
                               (element) => Padding(
                                 padding: const EdgeInsets.all(5.0),

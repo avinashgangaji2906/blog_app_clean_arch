@@ -1,6 +1,5 @@
 import 'package:blog_app_clean_arch/core/error/exception.dart';
 import 'package:blog_app_clean_arch/features/auth/data/models/user_model.dart';
-import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract interface class AuthRemoteDataSource {
@@ -43,8 +42,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       // converting raw data to model
       return UserModel.fromJson(response.user!.toJson())
         ..copyWith(email: currentUserSession!.user.email);
-    } catch (e, stackTrace) {
-      debugPrint("StackTrace :  ${stackTrace.toString()}");
+    } on AuthException catch (e) {
+      throw ServerException(message: e.message);
+    } catch (e) {
       throw ServerException(message: e.toString());
     }
   }
@@ -63,8 +63,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       // converting raw data to model
       return UserModel.fromJson(response.user!.toJson())
           .copyWith(email: currentUserSession!.user.email);
-    } catch (e, stackTrace) {
-      debugPrint("StackTrace :  ${stackTrace.toString()}");
+    } on AuthException catch (e) {
+      throw ServerException(message: e.message);
+    } catch (e) {
       throw ServerException(message: e.toString());
     }
   }

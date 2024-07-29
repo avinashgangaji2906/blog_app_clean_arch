@@ -1,15 +1,18 @@
+import 'package:blog_app_clean_arch/core/constants/constants.dart';
 import 'package:blog_app_clean_arch/core/error/exception.dart';
 import 'package:blog_app_clean_arch/core/error/failure.dart';
+import 'package:blog_app_clean_arch/core/network/internet_checker.dart';
+import 'package:blog_app_clean_arch/features/auth/data/models/user_model.dart';
 import 'package:blog_app_clean_arch/features/auth/data/sources/auth_remote_data_source.dart';
 import 'package:blog_app_clean_arch/core/entities/user.dart';
 import 'package:blog_app_clean_arch/features/auth/domain/repository/auth_repository.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 class AuthRespositoryImpl implements AuthRepository {
   final AuthRemoteDataSource authRemoteDataSource;
+  final InternetChecker internetChecker;
 
-  AuthRespositoryImpl(this.authRemoteDataSource);
+  AuthRespositoryImpl(this.authRemoteDataSource, this.internetChecker);
 
   @override
   Future<Either<Failure, User>> loginWithEmailAndPassword({
@@ -40,10 +43,12 @@ class AuthRespositoryImpl implements AuthRepository {
 // a function which will be return a function becuase the return type of both functions is same
   Future<Either<Failure, User>> _getUser(Future<User> Function() fn) async {
     try {
+      // if no internet logic
+      if (!await (internetChecker.isConnected)) {
+        return left(Failure(Constants.noConnectionErrorMessage));
+      }
       User user = await fn();
-      return right(user); // success no error
-    } on supabase.AuthException catch (e) {
-      return left(Failure(e.message));
+      return right(user);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }
@@ -52,6 +57,16 @@ class AuthRespositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, User>> getCurrentUser() async {
     try {
+      // if no internet logic
+      if (!await (internetChecker.isConnected)) {
+        final session = authRemoteDataSource.currentUserSession;
+        if (session == null) {
+          return left(Failure('User is not logged in'));
+        } else {
+          return right(UserModel(
+              id: session.user.id, name: '', email: session.user.email ?? ''));
+        }
+      }
       final user = await authRemoteDataSource.getCurrentUserData();
       if (user == null) {
         return left(Failure('User is not logged in'));
